@@ -1,7 +1,6 @@
 import { memo, useEffect, useMemo, useState } from 'react';
 
 const Card = memo(({ name, image, position, biography }) => {
-  console.log('Rendering...');
   return (
     <div >
       <h2>Name: {name}</h2>
@@ -15,7 +14,7 @@ const Card = memo(({ name, image, position, biography }) => {
 function App() {
   const [politicians, setPoliticians] = useState([]);
   const [searchPolitician, setSearchPolitician] = useState('');
-
+  const [selectPosition, setSelectPosition] = useState('');
   const getPoliticans = async () => {
     const response = await fetch(`http://localhost:3333/politicians`);
     const data = await response.json();
@@ -29,12 +28,38 @@ function App() {
 
   const filteredPolitians = useMemo(() => {
     const search = searchPolitician.toLowerCase();
-    return politicians.filter(p => p.name.toLowerCase().includes(search) || p.biography.toLowerCase().includes(search));
-  }, [searchPolitician, politicians]);
+    let filtered = politicians;
+    if (searchPolitician !== '') {
+      filtered = filtered.filter(p => p.name.toLowerCase().includes(search) || p.biography.toLowerCase().includes(search));
+    }
+
+    if (selectPosition) {
+      filtered = filtered.filter(p => p.position === selectPosition);
+    }
+    return filtered;
+  }, [searchPolitician, politicians, selectPosition]);
+
+  const positionPoliticians = useMemo(() => {
+    return politicians.reduce((acc, curr) => {
+      if (!acc.includes(curr.position)) {
+        acc.push(curr.position);
+      }
+      return acc;
+    }, []);
+  }, [politicians]);
+
 
   return (
     <>
       <h1>Ricerca Politici</h1>
+      <p>Per position</p>
+      <select value={selectPosition} onChange={e => setSelectPosition(e.target.value)}>
+        <option value="">----</option>
+        {positionPoliticians.map((p, i) => (
+          <option key={i} value={p} >{p}</option>
+        ))}
+      </select>
+      <p>Per Nome o Biografia</p>
       <input type="text" value={searchPolitician} onChange={e => setSearchPolitician(e.target.value)} />
       {filteredPolitians.map(p => (
         <Card key={p.id}
