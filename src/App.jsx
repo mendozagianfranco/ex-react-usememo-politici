@@ -15,7 +15,7 @@ function App() {
   const [politicians, setPoliticians] = useState([]);
   const [searchPolitician, setSearchPolitician] = useState('');
   const [selectPosition, setSelectPosition] = useState('');
-  const getPoliticans = async () => {
+  const getPoliticians = async () => {
     const response = await fetch(`http://localhost:3333/politicians`);
     const data = await response.json();
 
@@ -23,10 +23,10 @@ function App() {
   };
 
   useEffect(() => {
-    getPoliticans();
+    getPoliticians();
   }, []);
 
-  const filteredPolitians = useMemo(() => {
+  const filteredPoliticians = useMemo(() => {
     const search = searchPolitician.toLowerCase();
     let filtered = politicians;
     if (searchPolitician !== '') {
@@ -61,7 +61,7 @@ function App() {
       </select>
       <p>Per Nome o Biografia</p>
       <input type="text" value={searchPolitician} onChange={e => setSearchPolitician(e.target.value)} />
-      {filteredPolitians.map(p => (
+      {filteredPoliticians.map(p => (
         <Card key={p.id}
           name={p.name}
           image={p.image}
